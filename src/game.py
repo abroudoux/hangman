@@ -1,6 +1,4 @@
-import random
-
-from src.art import Art
+from src.ascii import Ascii
 from src.utils import Utils
 from src.debug import Debug
 
@@ -20,6 +18,7 @@ class Game:
         self.guesses = 0
         self.has_win = False
         self.has_loose = False
+        self.ascii = Ascii()
 
         self.words_file = Utils().get_words_file()
 
@@ -27,8 +26,7 @@ class Game:
 
     def __config(self):
         while len(self.word) < 7:
-            lines = open(self.words_file).read().splitlines()
-            self.word = str.upper(random.choice(lines))
+            self.word = Utils().choose_random_word(self.words_file)
 
         self.len_word = len(self.word)
 
@@ -38,7 +36,7 @@ class Game:
         return
 
     def play(self):
-        Art().play()
+        self.ascii.play()
 
         debugger = Debug(self)
         debugger.print("The word to guess is:", self.word)
@@ -135,12 +133,14 @@ class Game:
 
     def __win(self):
         if self.has_win:
+            # self.ascii.win()
             print(f"You've win! Congratulations! The word was {self.word}")
             print(f"You've finished this game with {self.penalities} penalities and {self.guesses}")
             exit(1)
 
     def __loose(self):
         if self.has_loose:
+            # self.ascii.loose()
             print(f"You're such a looser! The word was {self.word}")
             print(f"You've finished this game with {self.penalities} penalities and {self.guesses}")
             exit(1)
