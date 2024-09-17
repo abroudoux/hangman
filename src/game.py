@@ -1,6 +1,8 @@
 import random
 import os
 
+from src.art import Art
+
 class Game:
     def __init__(self):
         self.word = ""
@@ -13,56 +15,92 @@ class Game:
         self.medium_penality = 5
         self.big_penality = 10
         self.limit_penalities = 30
+        self.limit_guesses = 3
+        self.has_win = False
 
-        self.path = os.path.abspath(os.path.dirname(__file__))
-        self.words_list_path = "../ressources/words.txt"
-        self.words_list = os.path.join(self.path, self.words_list_path)
+        self.__path = os.path.abspath(os.path.dirname(__file__))
+        self.__words_list_path = "../ressources/words.txt"
+        self.words_file = os.path.join(self.__path, self.__words_list_path)
 
+        self.__config(self.words_file)
         self.__play()
 
     def __play(self):
-        self.word = self.__choose_word(self.words_list)
-        self.len_word, self.chars_word = self.__process_word()
+        Art().play()
 
         print("Welcome to the hangman game.")
         print("The word to guess is:", self.word, self.chars_word)
 
-        for char in self.chars_word:
-            print(" _ ", end = " ")
+        self.__turn()
 
-        print("")
-
-        while self.penalities < self.limit_penalities or len(self.chars_guess) < len(self.chars_word):
-            self.__ask_user()
-            print(f"Penalities: {self.penalities}. Wrong chars guessed: {self.chars_errors}.")
-
-    def __choose_word(self, file):
+    def __config(self, file):
         while len(self.word) < 7:
             lines = open(file).read().splitlines()
             self.word = str.upper(random.choice(lines))
 
-        return self.word
-
-    def __process_word(self):
         self.len_word = len(self.word)
 
         for char in self.word:
             self.chars_word.append(char)
 
-        return self.len_word, self.chars_word
+        return
+
+    def __turn(self):
+        self.__print()
+
+        if self.has_win:
+            Art().win()
+            print("You've won!")
+            return
+
+        if self.penalities >= self.limit_penalities:
+            Art().loose()
+            print("You've lost!")
+            return
+
+        while self.penalities < self.limit_penalities or not self.has_win:
+            self.__ask_user()
+            print(f"Penalities: {self.penalities}. Wrong chars guessed: {self.chars_errors}")
+            print("You can make a guess at any time by typing 'guess'")
+
+    def __print(self):
+        if not self.chars_guess:
+            for char in self.chars_word:
+                print(" _ ", end=" ")
+
+            print("")
+        else:
+            return
 
     def __ask_user(self):
-        guess = str.upper(input("Please enter a letter: "))
+        string = str.upper(input("Please enter a letter: "))
 
-        if guess in self.chars_word:
+        if string == "GUESS":
+            guess = str.upper(input("Make a guess: "))
+
+            if not guess == str.upper(self.word):
+                print("Wrong guess")
+                self.penalities += self.big_penality
+                return
+
+            self.has_win = True
+            return
+
+        char = string[0]
+
+        if not char.isalpha():
+            print("Please enter a valid character.")
+            self.__ask_user()
+
+        if char in self.chars_word:
             print("Good guess")
             return
 
-        if guess in self.chars_errors:
+        if char in self.chars_errors:
             self.penalities += self.little_penality
             return
 
-        self.chars_errors.append(guess)
+        self.chars_errors.append(char)
         self.penalities += self.medium_penality
 
         print("Bad guess")
