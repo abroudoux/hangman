@@ -2,13 +2,23 @@ from src.utils import Utils
 
 class Ascii:
     def __init__(self):
+        self.utils = Utils()
+
         self.title = ""
         self.win = ""
         self.loose = ""
+        self.cheat = ""
 
-        self.title_file = Utils().get_file("../ressources/arts/title")
-        self.win_file = Utils().get_file("../ressources/arts/win")
-        self.loose_file = Utils().get_file("../ressources/arts/loose")
+        self.title_file = self.utils.get_file("../ressources/ascii/title")
+        self.win_file = self.utils.get_file("../ressources/ascii/win")
+        self.loose_file = self.utils.get_file("../ressources/ascii/loose")
+        self.cheat_file = self.utils.get_file("../ressources/ascii/cheat")
+
+    @staticmethod
+    def __read_ascii_art(file):
+        art = open(file).read()
+
+        return art
 
     def play(self):
         self.title = self.__read_ascii_art(self.title_file)
@@ -22,8 +32,6 @@ class Ascii:
         self.loose = self.__read_ascii_art(self.loose_file)
         print(self.loose)
 
-    @staticmethod
-    def __read_ascii_art(file):
-        art = open(file).read()
-
-        return art
+    def cheat(self):
+        self.cheat = self.__read_ascii_art(self.cheat_file)
+        print(self.cheat)

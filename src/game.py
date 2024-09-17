@@ -1,10 +1,17 @@
 from src.ascii import Ascii
 from src.utils import Utils
 from src.debug import Debug
+from src.cheat import Cheat
 
 class Game:
-    def __init__(self):
+    def __init__(self, cheat=False):
+        self.ascii = Ascii()
+        self.utils = Utils()
+        self.cheat = Cheat()
+        self.debug = Debug(self)
+
         self.word = ""
+        self.guessed_chars = ""
         self.len_word = None
         self.chars_word = []
         self.chars_guesses = []
@@ -18,13 +25,17 @@ class Game:
         self.guesses = 0
         self.has_win = False
         self.has_loose = False
-        self.ascii = Ascii()
+        self.is_cheat_activated = cheat
 
-        self.words_file = Utils().get_words_file()
+        self.__cheat_init()
+        self.words_file = self.utils.get_words_file()
+        self.__config_word()
 
-        self.__config()
+    def __cheat_init(self):
+        print("Cheat code activated") if self.is_cheat_activated else None
+        return
 
-    def __config(self):
+    def __config_word(self):
         while len(self.word) < 7:
             self.word = Utils().choose_random_word(self.words_file)
 
@@ -37,38 +48,36 @@ class Game:
 
     def play(self):
         self.ascii.play()
-
-        debugger = Debug(self)
-        debugger.print("The word to guess is:", self.word)
+        self.debug.print("The word to guess is:", self.word)
 
         print("Welcome to the hangman game.")
 
         while not self.has_loose or not self.has_win:
-            self.__check_loose()
+            self.__is_lost()
+            self.__is_won()
             self.__turn()
 
         return
 
     def __turn(self):
-        self.__print()
+        self.__print_hints()
 
         if self.has_win:
-            self.__win()
+            self.__has_win()
             return
 
         if self.has_loose:
-            self.__loose()
+            self.__has_loose()
             return
 
         print(f"Penalities: {self.penalities}.", end=" ") if self.penalities > 0 else None
         print(f"Wrong chars guessed: {self.chars_errors}") if self.chars_errors else None
-        print("You can make a guess at any time by typing 'guess'")
 
         self.__ask_user()
 
         return
 
-    def __print(self):
+    def __print_hints(self):
         if not self.chars_guesses:
             for char in self.chars_word:
                 print(" _ ", end=" ")
@@ -76,78 +85,75 @@ class Game:
             print("")
             return
 
+        self.guessed_chars = self.__print_guessed_chars()
+        print(self.guessed_chars)
+        return
+
+    def __print_guessed_chars(self):
         __temp_arr = []
-        [__temp_arr.insert(i, "") for i in range(len(self.chars_word))]
+        for i in range(len(self.chars_word)):
+            __temp_arr.insert(i, "")
 
         for char in self.chars_guesses:
-            indexes = [i for i, c in enumerate(self.chars_word) if c == char]
-            [__temp_arr.__setitem__(i, char) for i in indexes]
+            for i, c in enumerate(self.chars_word):
+                if c == char:
+                    __temp_arr[i] = char
 
         if self.len_word == len("".join(__temp_arr)):
             self.has_win = True
             return
 
-        formatted_output = ' '.join([char if char != '' else '_' for char in __temp_arr])
-        print(formatted_output)
-        return
+        guessed_chars = ' '.join([char if char != '' else '_' for char in __temp_arr])
+        return guessed_chars
 
     def __ask_user(self):
         string = str.upper(input("Please enter a letter: "))
 
-        if string == "GUESS":
-            guess = str.upper(input("Make a guess: "))
+        self.__ask_user() if not string else None
 
-            if not guess == str.upper(self.word):
-                print("Wrong guess")
-                self.penalities += self.big_penality
-                self.guesses += 1
-                return
-
+        if len(string) > 1 and not string == self.word:
+            print("Wrong guess")
+            self.penalities += self.big_penality
+            self.guesses += 1
+            return
+        elif len(string) > 1 and string == self.word:
             self.has_win = True
+            self.__has_win()
             return
 
         char = string[0]
-
-        if not char.isalpha():
-            print("Please enter a valid character.")
-            self.__ask_user()
-
-        if char in self.chars_guesses:
-            print("You've already guess this letter. Please chose another one.")
-            return
 
         if char in self.chars_word:
             self.chars_guesses.append(char)
             print("Good guess!")
             return
 
-        if char in self.chars_errors:
-            self.penalities += self.little_penality
-            return
-
         self.chars_errors.append(char)
-        self.penalities += self.medium_penality
+        self.penalities += self.little_penality
 
         print("Bad guess")
         return
 
-    def __win(self):
+    def __has_win(self):
         if self.has_win:
             # self.ascii.win()
             print(f"You've win! Congratulations! The word was {self.word}")
-            print(f"You've finished this game with {self.penalities} penalities and {self.guesses}")
+            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guessess")
             exit(1)
 
-    def __loose(self):
+    def __has_loose(self):
         if self.has_loose:
             # self.ascii.loose()
             print(f"You're such a looser! The word was {self.word}")
-            print(f"You've finished this game with {self.penalities} penalities and {self.guesses}")
+            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guessess")
             exit(1)
 
-    def __check_loose(self):
+    def __is_lost(self):
         if self.penalities >= self.limit_penalities or self.guesses >= self.limit_guesses:
             self.has_loose = True
             return
 
         return
+
+    def __is_won(self):
+        pass
