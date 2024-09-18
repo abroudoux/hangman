@@ -54,7 +54,6 @@ class Game:
 
         while not self.has_loose or not self.has_win:
             self.__is_lost()
-            self.__is_won()
             self.__turn()
 
         return
@@ -154,6 +153,3 @@ class Game:
             return
 
         return
-
-    def __is_won(self):
-        pass
