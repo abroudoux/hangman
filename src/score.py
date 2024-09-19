@@ -10,8 +10,9 @@ class Score:
         self.best_score_file = self.file_utils.get_file(self.best_score_file_path)
 
         self.penalities = 0
-        self.limit_penalities = 30
         self.guesses = 0
+        self.limit_penalities = 30
+        self.num_turns = 0
 
         self.get_best_score()
 
@@ -53,3 +54,16 @@ class Score:
     def add_guess(self):
         self.guesses += 1
         return
+
+    def return_scores(self):
+        return self.actual_score, self.penalities, self.guesses
+
+    def return_rules(self):
+        return self.limit_penalities
+
+    def add_turn(self):
+        self.num_turns += 1
+        return
+
+    def return_num_turns(self):
+        return self.num_turns
