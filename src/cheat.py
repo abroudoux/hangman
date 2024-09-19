@@ -1,10 +1,10 @@
 import re
 
-from src.utils import Utils
+from src.file import FileUtils
 
 class Cheat:
     def __init__(self):
-        self.utils = Utils()
+        self.file_utils = FileUtils()
 
         self.word = ""
         self.len_word = None
@@ -14,8 +14,8 @@ class Cheat:
         self.__get_list_words()
 
     def __get_list_words(self):
-        words_file = self.utils.get_words_file()
-        self.list_words = open(words_file).read().splitlines()
+        words_file = self.file_utils.get_words_file()
+        self.list_words = self.file_utils.read_file(words_file)
         return
 
     def __filter_with_len(self):

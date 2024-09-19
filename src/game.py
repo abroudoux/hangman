@@ -1,16 +1,16 @@
 from src.ascii import Ascii
-from src.random import Random
-from src.utils import Utils
+from src.api import ApiWord
 from src.debug import Debug
 from src.cheat import Cheat
+from src.file import FileUtils
 
 class Game:
     def __init__(self, cheat=False, random=False):
         self.ascii = Ascii()
-        self.utils = Utils()
         self.cheat = Cheat()
         self.debug = Debug(self)
-        self.random = Random()
+        self.api = ApiWord()
+        self.file_utils = FileUtils()
 
         self.word = ""
         self.guessed_chars = ""
@@ -34,11 +34,11 @@ class Game:
         self.__cheat_init() if self.is_cheat_activated else None
 
         if self.is_random_activated:
-            self.word = self.random.get_word()
+            self.word = self.api.get_word()
         else:
-            self.words_file = self.utils.get_words_file()
+            self.words_file = self.file_utils.get_words_file()
             while len(self.word) < 7:
-                self.word = Utils().choose_random_word(self.words_file)
+                self.word = self.file_utils.choose_random_word_in_file(self.words_file)
 
         self.__config_word()
 

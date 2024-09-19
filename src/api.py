@@ -1,6 +1,6 @@
 import requests
 
-class Random:
+class ApiWord:
     def __init__(self):
         self.word = ""
 

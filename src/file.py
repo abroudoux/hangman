@@ -33,7 +33,7 @@ class FileUtils:
 
     def get_words_file(self):
         words_file_path = "../ressources/data/words.txt"
-        words_file = self.get_files(words_file_path)
+        words_file = self.get_file(words_file_path)
         return words_file
 
     def choose_random_word_in_file(self, file_name):

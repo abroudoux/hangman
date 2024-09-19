@@ -1,18 +1,18 @@
-from src.utils import Utils
+from src.file import FileUtils
 
 class Ascii:
     def __init__(self):
-        self.utils = Utils()
+        self.file_utils = FileUtils()
 
         self.title = ""
         self.win = ""
         self.loose = ""
         self.cheat = ""
 
-        self.title_file = self.utils.get_file("../ressources/ascii/title")
-        self.win_file = self.utils.get_file("../ressources/ascii/win")
-        self.loose_file = self.utils.get_file("../ressources/ascii/loose")
-        self.cheat_file = self.utils.get_file("../ressources/ascii/cheat")
+        self.title_file = self.file_utils.get_file("../ressources/ascii/title")
+        self.win_file = self.file_utils.get_file("../ressources/ascii/win")
+        self.loose_file = self.file_utils.get_file("../ressources/ascii/loose")
+        self.cheat_file = self.file_utils.get_file("../ressources/ascii/cheat")
 
     @staticmethod
     def __read_ascii_art(file):
