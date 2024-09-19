@@ -1,5 +1,5 @@
 from src.ascii import Ascii
-from src.api import ApiWord
+from src.api import Api
 from src.debug import Debug
 from src.cheat import Cheat
 from src.file import FileUtils
@@ -9,7 +9,7 @@ class Game:
         self.ascii = Ascii()
         self.cheat = Cheat()
         self.debug = Debug(self)
-        self.api = ApiWord()
+        self.api = Api()
         self.file_utils = FileUtils()
 
         self.word = ""
@@ -31,7 +31,7 @@ class Game:
         self.is_cheat_activated = cheat
         self.is_random_activated = random
 
-        self.__cheat_init() if self.is_cheat_activated else None
+        self.__cheat_init()
 
         if self.is_random_activated:
             self.word = self.api.get_word()
@@ -40,14 +40,13 @@ class Game:
             while len(self.word) < 7:
                 self.word = self.file_utils.choose_random_word_in_file(self.words_file)
 
-        self.__config_word()
+        self.__get_word_props()
 
-    @staticmethod
-    def __cheat_init():
-        print("Cheat code activated")
+    def __cheat_init(self):
+        print("Cheat code activated") if self.is_cheat_activated else None
         return
 
-    def __config_word(self):
+    def __get_word_props(self):
         self.len_word = len(self.word)
 
         for char in self.word:
@@ -57,18 +56,18 @@ class Game:
 
     def play(self):
         self.ascii.play()
-        self.debug.print("The word to guess is", self.word)
+        self.debug.print_hint("The word to guess is", self.word)
 
         print("Welcome to the hangman game.")
 
-        while not self.has_loose or not self.has_win:
-            self.__is_lost()
+        while not self.has_loose or self.has_win:
             self.__turn()
 
         return
 
     def __turn(self):
         self.__print_hints()
+        self.__is_lost()
 
         if self.has_win:
             self.__has_win()
@@ -82,11 +81,10 @@ class Game:
         print(f"Wrong chars guessed: {self.chars_errors}") if self.chars_errors else None
 
         if self.is_cheat_activated:
-            chars = self.__print_guessed_chars()
+            chars = self.__determine_guessed_chars()
             self.cheat.suggest(chars)
 
         self.__ask_user()
-
         return
 
     def __print_hints(self):
@@ -97,11 +95,11 @@ class Game:
             print("")
             return
 
-        self.guessed_chars = self.__print_guessed_chars()
+        self.guessed_chars = self.__determine_guessed_chars()
         print(self.guessed_chars)
         return
 
-    def __print_guessed_chars(self):
+    def __determine_guessed_chars(self):
         __temp_arr = []
         for i in range(len(self.chars_word)):
             __temp_arr.insert(i, "")
@@ -119,8 +117,7 @@ class Game:
         return guessed_chars
 
     def __ask_user(self):
-        string = str.upper(input("Please enter a letter: "))
-
+        string = str.upper(input("Enter a letter: "))
         self.__ask_user() if not string else None
 
         if len(string) > 1 and not string == self.word:
@@ -146,11 +143,18 @@ class Game:
         print("Bad guess")
         return
 
+    def __is_lost(self):
+        if self.penalities >= self.limit_penalities or self.guesses >= self.limit_guesses:
+            self.has_loose = True
+            return
+        return
+
     def __has_win(self):
         if self.has_win:
             # self.ascii.win()
             print(f"You've win! Congratulations! The word was {self.word}")
             print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guesses")
+            self.__get_best_score()
             exit(1)
 
     def __has_loose(self):
@@ -160,12 +164,8 @@ class Game:
             print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guesses")
             exit(1)
 
-    def __is_lost(self):
-        if self.penalities >= self.limit_penalities or self.guesses >= self.limit_guesses:
-            self.has_loose = True
-            return
-
-        return
-
     def __get_best_score(self):
-        pass
+        best_score_file = self.file_utils.get_file("../ressources/data/best_score.txt")
+        actual_best_scole = self.file_utils.read_file(best_score_file)
+        print(actual_best_scole)
+        return
