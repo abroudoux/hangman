@@ -68,13 +68,14 @@ class Game:
         return
 
     def __turn(self):
-        score, penalities, guesses = self.score.return_scores()
+        score, penalities, guesses, turns = self.score.return_scores()
         limit_penalities = self.score.return_rules()
 
         self.__check_player_scores(limit_penalities, penalities)
+        self.__determine_guessed_chars()
 
         if self.has_win:
-            self.__has_win(score, penalities, guesses)
+            self.__has_win(score, penalities, guesses, turns)
             return
 
         if self.has_loose:
@@ -93,7 +94,6 @@ class Game:
 
         self.__ask_user()
         self.__print_hints()
-        self.__determine_guessed_chars()
         self.score.add_turn()
         return
 
@@ -154,11 +154,12 @@ class Game:
         print("Bad guess")
         return
 
-    def __has_win(self, score, penalities, guesses):
+    def __has_win(self, score, penalities, guesses, turns):
         if self.has_win:
             # self.ascii.win()
             print(f"You've win! Congratulations! The word was {self.word}")
             print(f"You've finished this game with {penalities} penalities and {guesses} guesses. Your score is {score}")
+            print(f"{turns} turns")
             exit(1)
 
     def __has_loose(self, penalities, guesses):
@@ -172,7 +173,6 @@ class Game:
         if penalities >= limit_penalities:
             self.has_loose = True
         elif self.guessed_word == self.word:
-            self.has_loose = False
             self.has_win = True
 
         return

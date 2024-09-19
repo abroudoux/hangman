@@ -12,7 +12,7 @@ class Score:
         self.penalities = 0
         self.guesses = 0
         self.limit_penalities = 30
-        self.num_turns = 0
+        self.turns = 0
 
         self.get_best_score()
 
@@ -37,11 +37,15 @@ class Score:
         return
 
     def increase_score(self, score):
-        self.actual_score += score if self.actual_score > 0 else self.actual_score == score
+        self.actual_score += score
         return
 
     def decrease_score(self, score):
-        self.actual_score -= score if self.actual_score - score > 0 else self.actual_score == score
+        if self.actual_score - score < 0:
+            self.actual_score = 0
+        else:
+            self.actual_score -= score
+
         return
 
     def return_score(self):
@@ -56,14 +60,11 @@ class Score:
         return
 
     def return_scores(self):
-        return self.actual_score, self.penalities, self.guesses
+        return self.actual_score, self.penalities, self.guesses, self.turns
 
     def return_rules(self):
         return self.limit_penalities
 
     def add_turn(self):
-        self.num_turns += 1
+        self.turns += 1
         return
-
-    def return_num_turns(self):
-        return self.num_turns
