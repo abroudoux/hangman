@@ -26,3 +26,9 @@ class Utils:
         chosen_word = str.upper(random.choice(lines))
 
         return chosen_word
+
+    @staticmethod
+    def read_file(file_name):
+        content = open(file_name).read().splitlines()
+
+        return content

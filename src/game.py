@@ -166,3 +166,6 @@ class Game:
             return
 
         return
+
+    def __get_best_score(self):
+        pass
