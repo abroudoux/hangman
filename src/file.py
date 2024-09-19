@@ -3,7 +3,7 @@ import random
 
 class FileUtils:
     def __init__(self):
-        pass
+        self.words_file_path = "../ressources/data/words.txt"
 
     @staticmethod
     def get_file(file_path):
@@ -18,13 +18,13 @@ class FileUtils:
 
     @staticmethod
     def clean_file(file_name):
-        open(file_name, 'w').close()
+        open(file_name, "w").close()
         return
 
     @staticmethod
     def write_file(file_name, new_content):
-        with open(file_name, 'a') as f:
-            f.write('\n'.join(new_content))
+        with open(file_name, "a") as f:
+            f.write("\n".join(new_content))
         return
 
     def replace_best_score(self, file_name, new_best_score):
@@ -32,8 +32,7 @@ class FileUtils:
         self.write_file(file_name, new_best_score)
 
     def get_words_file(self):
-        words_file_path = "../ressources/data/words.txt"
-        words_file = self.get_file(words_file_path)
+        words_file = self.get_file(self.words_file_path)
         return words_file
 
     def choose_random_word_in_file(self, file_name):

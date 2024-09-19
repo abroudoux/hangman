@@ -1,16 +1,18 @@
 from src.ascii import Ascii
-from src.api import Api
+from src.api import WordApi
 from src.debug import Debug
 from src.cheat import Cheat
 from src.file import FileUtils
+from src.score import Score
 
 class Game:
     def __init__(self, cheat=False, random=False):
         self.ascii = Ascii()
         self.cheat = Cheat()
         self.debug = Debug(self)
-        self.api = Api()
+        self.word_api = WordApi()
         self.file_utils = FileUtils()
+        self.score = Score()
 
         self.word = ""
         self.guessed_chars = ""
@@ -34,7 +36,7 @@ class Game:
         self.__cheat_init()
 
         if self.is_random_activated:
-            self.word = self.api.get_word()
+            self.word = self.word_api.get_word()
         else:
             self.words_file = self.file_utils.get_words_file()
             while len(self.word) < 7:
@@ -55,7 +57,7 @@ class Game:
         return
 
     def play(self):
-        self.ascii.play()
+        # self.ascii.play()
         self.debug.print_hint("The word to guess is", self.word)
 
         print("Welcome to the hangman game.")
@@ -122,10 +124,12 @@ class Game:
 
         if len(string) > 1 and not string == self.word:
             print("Wrong guess")
+            self.score.decrease_score(10)
             self.penalities += self.big_penality
             self.guesses += 1
             return
         elif len(string) > 1 and string == self.word:
+            self.score.increase_score(15)
             self.has_win = True
             self.__has_win()
             return
@@ -134,10 +138,12 @@ class Game:
 
         if char in self.chars_word:
             self.chars_guesses.append(char)
+            self.score.increase_score(5)
             print("Good guess!")
             return
 
         self.chars_errors.append(char)
+        self.score.decrease_score(3)
         self.penalities += self.little_penality
 
         print("Bad guess")
@@ -152,8 +158,9 @@ class Game:
     def __has_win(self):
         if self.has_win:
             # self.ascii.win()
+            score = self.score.return_score()
             print(f"You've win! Congratulations! The word was {self.word}")
-            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guesses")
+            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guesses. Your score is {score}")
             self.__get_best_score()
             exit(1)
 
@@ -165,7 +172,4 @@ class Game:
             exit(1)
 
     def __get_best_score(self):
-        best_score_file = self.file_utils.get_file("../ressources/data/best_score.txt")
-        actual_best_scole = self.file_utils.read_file(best_score_file)
-        print(actual_best_scole)
         return

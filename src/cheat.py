@@ -47,11 +47,9 @@ class Cheat:
     def suggest(self, chars):
         self.__return_word_filtered(chars)
         if not self.len_word:
-            print("here")
             self.__return_len_word()
             self.__filter_with_len()
         else:
-            print("no here")
             self.__filter_with_chars_guesses()
 
         print("self.selected_list_word", self.selected_list_word)

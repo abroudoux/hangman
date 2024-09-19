@@ -1,6 +1,6 @@
 import requests
 
-class Api:
+class WordApi:
     def __init__(self):
         self.chosen_word = ""
         self.api_ulr = "https://random-word-api.herokuapp.com/word"
