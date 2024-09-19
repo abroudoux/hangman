@@ -1,14 +1,16 @@
 from src.ascii import Ascii
+from src.random import Random
 from src.utils import Utils
 from src.debug import Debug
 from src.cheat import Cheat
 
 class Game:
-    def __init__(self, cheat=False):
+    def __init__(self, cheat=False, random=False):
         self.ascii = Ascii()
         self.utils = Utils()
         self.cheat = Cheat()
         self.debug = Debug(self)
+        self.random = Random()
 
         self.word = ""
         self.guessed_chars = ""
@@ -25,20 +27,27 @@ class Game:
         self.guesses = 0
         self.has_win = False
         self.has_loose = False
-        self.is_cheat_activated = cheat
 
-        self.__cheat_init()
-        self.words_file = self.utils.get_words_file()
+        self.is_cheat_activated = cheat
+        self.is_random_activated = random
+
+        self.__cheat_init() if self.is_cheat_activated else None
+
+        if self.is_random_activated:
+            self.word = self.random.get_word()
+        else:
+            self.words_file = self.utils.get_words_file()
+            while len(self.word) < 7:
+                self.word = Utils().choose_random_word(self.words_file)
+
         self.__config_word()
 
-    def __cheat_init(self):
-        print("Cheat code activated") if self.is_cheat_activated else None
+    @staticmethod
+    def __cheat_init():
+        print("Cheat code activated")
         return
 
     def __config_word(self):
-        while len(self.word) < 7:
-            self.word = Utils().choose_random_word(self.words_file)
-
         self.len_word = len(self.word)
 
         for char in self.word:
@@ -48,7 +57,7 @@ class Game:
 
     def play(self):
         self.ascii.play()
-        self.debug.print("The word to guess is:", self.word)
+        self.debug.print("The word to guess is", self.word)
 
         print("Welcome to the hangman game.")
 
@@ -72,13 +81,17 @@ class Game:
         print(f"Penalities: {self.penalities}.", end=" ") if self.penalities > 0 else None
         print(f"Wrong chars guessed: {self.chars_errors}") if self.chars_errors else None
 
+        if self.is_cheat_activated:
+            chars = self.__print_guessed_chars()
+            self.cheat.suggest(chars)
+
         self.__ask_user()
 
         return
 
     def __print_hints(self):
         if not self.chars_guesses:
-            for char in self.chars_word:
+            for _ in self.chars_word:
                 print(" _ ", end=" ")
 
             print("")
@@ -137,14 +150,14 @@ class Game:
         if self.has_win:
             # self.ascii.win()
             print(f"You've win! Congratulations! The word was {self.word}")
-            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guessess")
+            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guesses")
             exit(1)
 
     def __has_loose(self):
         if self.has_loose:
             # self.ascii.loose()
             print(f"You're such a looser! The word was {self.word}")
-            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guessess")
+            print(f"You've finished this game with {self.penalities} penalities and {self.guesses} guesses")
             exit(1)
 
     def __is_lost(self):
